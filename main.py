@@ -70,16 +70,43 @@ def get_currency_history(start_date, end_date, currency_code):
             result[xlm_date.__format__('%Y-%m')] = round(value / nominal, digits)
             current_date = current_date + relativedelta(months=1)
 
+        elif xlm_date.month > current_date.month:
+            current_date = current_date + relativedelta(months=1)
+
     return result
 
+
+def create_dataframe(currensies, currensies_codes, start_date, end_date):
+    """
+    Создает pandas dataframe с историей изменения валют
+    :param currensies: (list) список валют
+    :param currensies_codes: (dict) словарь содержащий iso коды валют
+    :param start_date: (datetime) начальная дата
+    :param end_date: (datetime) конечная дата
+    :return: (dataframe)
+    """
+    first = True
+
+    for currency in currensies:
+        if first:
+            first = False
+            data = get_currency_history(start_date, end_date, currensies_codes[currency])
+            dataframe = pd.DataFrame(data.values(), index=data.keys(), columns=[currency])
+        else:
+            data = get_currency_history(start_date, end_date, currensies_codes[currency])
+            dataframe[currency] = data
+
+    return dataframe
 
 
 def main():
     currensies_codes = {'USD': 'R01235', 'EUR': 'R01239', 'KZT': 'R01335', 'UAH': 'R01720', 'BYR': 'R01090'}
     filename = 'vacancies_dif_currencies.csv'
     currensies, start_date, end_date = get_csv_data(filename)
-    print(get_currency_history(start_date, end_date, 'R01090'))
-
+    #currensies = ['USD', 'EUR', 'KZT', 'UAH', 'BYR']
+    #start_date = datetime(2003, 1, 24)
+    #end_date = datetime(2022, 7, 19)
+    print(create_dataframe(currensies, currensies_codes, start_date, end_date))
 
 
 if __name__ == "__main__":
