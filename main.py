@@ -35,7 +35,6 @@ def get_csv_data(filename):
                 end_date(datetime): дата самой свежей вакансии в выгрузке
     """
     df = pd.read_csv(filename)
-    print("File read succesfully")
     salary_count = df['salary_currency'].value_counts()
     currensies = salary_count[salary_count > 5000].index.to_list()
     start_date = format_csv_date(df['published_at'].min())
@@ -70,7 +69,7 @@ def get_currency_history(start_date, end_date, currency_code):
             result[xlm_date.__format__('%Y-%m')] = round(value / nominal, digits)
             current_date = current_date + relativedelta(months=1)
 
-        elif xlm_date.month > current_date.month:
+        elif xlm_date.month > current_date.month and xlm_date.year >= current_date.year:
             current_date = current_date + relativedelta(months=1)
 
     return result
@@ -96,17 +95,22 @@ def create_dataframe(currensies, currensies_codes, start_date, end_date):
             data = get_currency_history(start_date, end_date, currensies_codes[currency])
             dataframe[currency] = data
 
+    dataframe.index.name = 'date'
     return dataframe
 
 
 def main():
     currensies_codes = {'USD': 'R01235', 'EUR': 'R01239', 'KZT': 'R01335', 'UAH': 'R01720', 'BYR': 'R01090'}
-    filename = 'vacancies_dif_currencies.csv'
+    filename = 'csv/vacancies_dif_currencies.csv'
     currensies, start_date, end_date = get_csv_data(filename)
-    #currensies = ['USD', 'EUR', 'KZT', 'UAH', 'BYR']
-    #start_date = datetime(2003, 1, 24)
-    #end_date = datetime(2022, 7, 19)
-    print(create_dataframe(currensies, currensies_codes, start_date, end_date))
+    print("File read succesfully")
+    currensies.remove('RUR')
+
+    currensies_history = create_dataframe(currensies, currensies_codes, start_date, end_date)
+    print('Dataframe created')
+
+    currensies_history.to_csv('csv/currensies_history.csv', sep=',')
+    print('CSV file created')
 
 
 if __name__ == "__main__":
