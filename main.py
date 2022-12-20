@@ -99,18 +99,25 @@ def create_dataframe(currensies, currensies_codes, start_date, end_date):
     return dataframe
 
 
-def main():
+def create_cur_history(input_file, output_file):
+    """
+    Создаёт csv файл содержащий историю изменения валют
+    :param input_file: имя входного файла
+    :param output_file: имя выходного файла
+    :return:
+    """
     currensies_codes = {'USD': 'R01235', 'EUR': 'R01239', 'KZT': 'R01335', 'UAH': 'R01720', 'BYR': 'R01090'}
-    filename = 'csv/vacancies_dif_currencies.csv'
-    currensies, start_date, end_date = get_csv_data(filename)
+    currensies, start_date, end_date = get_csv_data(input_file)
     print("File read succesfully")
     currensies.remove('RUR')
-
     currensies_history = create_dataframe(currensies, currensies_codes, start_date, end_date)
     print('Dataframe created')
-
-    currensies_history.to_csv('csv/currensies_history.csv', sep=',')
+    currensies_history.to_csv(output_file, sep=',')
     print('CSV file created')
+
+
+def main():
+    create_cur_history('vacancies_dif_currencies.csv', 'currensies_history.csv')
 
 
 if __name__ == "__main__":
