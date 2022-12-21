@@ -1,4 +1,3 @@
-*.csv
 csv_playground.ipynb
 venv/
 .idea/
