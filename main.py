@@ -117,6 +117,14 @@ def create_cur_history(input_file, output_file):
 
 
 def convert_cur(salary, publ_date, cur, cur_history):
+    """
+    Конвертирует сумму в рубли, по курсу на момент публикации
+    :param salary: сумма
+    :param publ_date: дата публикации
+    :param cur: валюта
+    :param cur_history: (dataframe) история изменения курсов валют
+    :return: округлённая до 1 знака после запятой сумма
+    """
     if cur == 'RUR':
         return salary
     elif cur not in cur_history.columns:
@@ -125,6 +133,13 @@ def convert_cur(salary, publ_date, cur, cur_history):
 
 
 def convert_salary(input_file, cur_history_file, output_file):
+    """
+    Изменяет dataframe, создавая новый столбец salary в котором хранится зарплата перевённая в рубли, данные получены
+    из столбцов salary_from, salary_to и salary_currency
+    :param input_file: имя входного файла
+    :param cur_history_file: имя файла хранящего историю изменения курса валют
+    :param output_file: имя выходного файла, в него будут загруженны первые 100 строк итогового dataframe
+    """
     cur_history = pd.read_csv(cur_history_file, index_col=0)
     vacancies = pd.read_csv(input_file)
     print('Files read')
